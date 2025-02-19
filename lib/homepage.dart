@@ -131,14 +131,36 @@ class _HomePageState extends State<HomePage> {
   String direction = 'right'; // Dirección inicial del jugador
   bool gameStarted = false; // Estado del juego (iniciado/no iniciado)
   int score = 0; // Puntuación del jugador
+  Timer? gameTimer;
+  Timer? ghostTimer;
 
   // Función para iniciar el juego
   void startGame() {
+    // Cancela el temporizador existente si el juego ya ha comenzado
+    if (gameTimer != null) {
+      gameTimer!.cancel();
+    }
+    // Cancela el temporizador del fantasma existente si el juego ya ha comenzado
+    if (ghostTimer != null) {
+      ghostTimer!.cancel();
+    }
+
+    // Restablece las variables del estado del juego a sus valores iniciales
+    setState(() {
+      player = numberInRow * 15 + 1; // Posición inicial del jugador
+      ghost = numberInRow * 2 + 9; // Posición inicial del fantasma
+      mouthClosed = true; // Estado de la boca del jugador (abierta/cerrada)
+      direction = 'right'; // Dirección inicial del jugador
+      gameStarted = false; // Estado del juego (iniciado/no iniciado)
+      score = 0; // Puntuación del jugador
+      food = []; // Lista de índices que representan la comida en el grid
+    });
+
     moveGhost(); // Inicia el movimiento del fantasma
     gameStarted = true; // Cambia el estado del juego a iniciado
     getFood(); // Genera la comida en el grid
     Duration duration = Duration(milliseconds: 100); // Intervalo de tiempo para el movimiento del jugador
-    Timer.periodic(duration, (timer) {
+    gameTimer = Timer.periodic(duration, (timer) {
       if (food.contains(player)) {
         food.remove(player); // Elimina la comida si el jugador la consume
         score++; // Incrementa la puntuación
@@ -173,8 +195,8 @@ class _HomePageState extends State<HomePage> {
   String ghostDirection = "left"; // Dirección inicial del fantasma
   // Función para mover el fantasma
   void moveGhost() {
-    Duration ghostSpeed = Duration(milliseconds: 500); // Intervalo de tiempo para el movimiento del fantasma
-    Timer.periodic(ghostSpeed, (timer) {
+    Duration ghostSpeed = Duration(milliseconds: 400); // Intervalo de tiempo para el movimiento del fantasma
+    ghostTimer = Timer.periodic(ghostSpeed, (timer) {
       // Lógica para cambiar la dirección del fantasma evitando las barreras
       if (!barriers.contains(ghost - 1) && ghostDirection != "right") {
         ghostDirection = "left";
@@ -354,16 +376,18 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: Container(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Distribuye los widgets hijos de manera uniforme a lo largo de la fila
                 children: [
                   Text(
-                    'Score: ' + score.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 40),
+                    'Score: ' + score.toString(), // Muestra la puntuación actual del jugador
+                    style: TextStyle(color: Colors.white, fontSize: 40), // Estilo del texto de la puntuación
                   ),
                   GestureDetector(
-                    onTap: startGame,
-                    child: Text('P L A Y',
-                      style: TextStyle(color: Colors.white, fontSize: 40)),
+                    onTap: startGame, // Inicia el juego cuando se toca el texto "P L A Y"
+                    child: Text(
+                      'P L A Y', // Texto del botón de inicio del juego
+                      style: TextStyle(color: Colors.white, fontSize: 40), // Estilo del texto del botón
+                    ),
                   ),
                 ],
               ),

@@ -195,6 +195,11 @@ class _HomePageState extends State<HomePage> {
   String ghostDirection = "left"; // Dirección inicial del fantasma
   // Función para mover el fantasma
   void moveGhost() {
+    // Cancela el temporizador del fantasma existente si el juego ya ha comenzado
+    if (ghostTimer != null) {
+      ghostTimer!.cancel();
+    }
+
     Duration ghostSpeed = Duration(milliseconds: 400); // Intervalo de tiempo para el movimiento del fantasma
     ghostTimer = Timer.periodic(ghostSpeed, (timer) {
       // Lógica para cambiar la dirección del fantasma evitando las barreras
@@ -307,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                 } else if (details.delta.dx < 0) {
                   direction = 'left';
                 }
-                print(direction);
+                //print(direction);
               },
               child: Container(
                 child: GridView.builder(
